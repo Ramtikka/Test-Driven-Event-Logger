@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_EventBuffer_Test" Id="{7c8068a8-9752-4a7e-bf05-3ad7ff1e8bd3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_EventBuffer_Test EXTENDS FB_TestSuite
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[AddThreeEventSuccessfully();]]></ST>
+    </Implementation>
+    <Method Name="AddThreeEventSuccessfully" Id="{ce1cff89-7ed1-4626-8bbb-e85fbf566594}">
+      <Declaration><![CDATA[METHOD AddThreeEventSuccessfully
+VAR
+	EventRingBuffer : FB_EventRingBuffer;
+	//Event1
+	eEvent1 : ST_Event :=(
+							eEventType := E_EventType.Alaram,
+							eEventSeverity := TcEventseverity.Verbose,
+							nEventIdentity := 69,
+							sEventText := 'Hello 1',
+							dtTimeStamp := DT#2016-10-11-11:11:11);
+						
+	//Event2
+	eEvent2 : ST_Event:=(
+							eEventType := E_EventType.Alaram,
+							eEventSeverity := TcEventseverity.Verbose,
+							nEventIdentity := 269,
+							sEventText := 'Hello 2',
+							dtTimeStamp := DT#2016-10-12-11:11:11);
+	
+	//Event3
+	eEvent3 : ST_Event:=(
+							eEventType := E_EventType.Alaram,
+							eEventSeverity := TcEventseverity.Verbose,
+							nEventIdentity := 369,
+							sEventText := 'Hello 3',
+							dtTimeStamp := DT#2016-10-13-11:11:11);
+	bOk : BOOL;
+	nNumberOfEvents : UDINT;
+	stEvent : ST_Event;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Test();
+	//Event1 Append
+	EventRingBuffer.Apend(stEvent:=eEvent1,Apend=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 1 is not Added');
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=1,
+				 Actual:= nNumberOfEvents,
+				 Message:='event addition to ring buffer is not done');
+				 
+	//Event2 Append
+	EventRingBuffer.Apend(stEvent:=eEvent2,Apend=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 2 is not Added');
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=2,
+				 Actual:= nNumberOfEvents,
+				 Message:='event addition to ring buffer is not done');
+				 
+	//Event 3 Append
+	EventRingBuffer.Apend(stEvent:=eEvent3,Apend=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 3 is not Added');
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=3,
+				 Actual:= nNumberOfEvents,
+				 Message:='event addition to ring buffer is not done');
+				 
+	//Event1 Remove
+	EventRingBuffer.Remove(stEvent=>stEvent ,Remove=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 1 is not red and Removed');
+	AssertEquals(Expected:=eEvent1.eEventType, Actual:=stEvent.eEventType, Message:='Reverted Event type is not matching with 1st Event');
+	AssertEquals(Expected:=eEvent1.eEventSeverity, Actual:=stEvent.eEventSeverity, Message:='Reverted Severity is not matching with 1st Event');
+	AssertEquals(Expected:=eEvent1.nEventIdentity, Actual:=stEvent.nEventIdentity, Message:='Reverted Event Identity is not matching with 1st Event');
+	AssertEquals(Expected:=eEvent1.sEventText, Actual:=stEvent.sEventText, Message:='Reverted Event text is not matching with 1st Event');
+	AssertEquals(Expected:=eEvent1.dtTimeStamp, Actual:=stEvent.dtTimeStamp, Message:='Reverted date is not matching with 1st Event');	
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=2,
+				 Actual:= nNumberOfEvents,
+				 Message:='event read and removal to ring buffer is not done');
+				 
+	//Event2 Remove
+	EventRingBuffer.Remove(stEvent=>stEvent ,Remove=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 2 is not red and Removed');
+	AssertEquals(Expected:=eEvent2.eEventType, Actual:=stEvent.eEventType, Message:='Reverted Event type is not matching with 2nd Event');
+	AssertEquals(Expected:=eEvent2.eEventSeverity, Actual:=stEvent.eEventSeverity, Message:='Reverted Severity is not matching with 2nd Event');
+	AssertEquals(Expected:=eEvent2.nEventIdentity, Actual:=stEvent.nEventIdentity, Message:='Reverted Event Identity is not matching with 2nd Event');
+	AssertEquals(Expected:=eEvent2.sEventText, Actual:=stEvent.sEventText, Message:='Reverted Event text is not matching with 2nd Event');
+	AssertEquals(Expected:=eEvent2.dtTimeStamp, Actual:=stEvent.dtTimeStamp, Message:='Reverted date is not matching with 2nd Event');	
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=1,
+				 Actual:= nNumberOfEvents,
+				 Message:='event read and removal to ring buffer is not done');
+				 
+	//Event3 Remove
+	EventRingBuffer.Remove(stEvent=>stEvent ,Remove=>bOK);
+	AssertTrue(Condition:=bOk, Message:='Event 3 is not red and Removed');
+	AssertEquals(Expected:=eEvent3.eEventType, Actual:=stEvent.eEventType, Message:='Reverted Event type is not matching with 3rd Event');
+	AssertEquals(Expected:=eEvent3.eEventSeverity, Actual:=stEvent.eEventSeverity, Message:='Reverted Severity is not matching with 3rd Event');
+	AssertEquals(Expected:=eEvent3.nEventIdentity, Actual:=stEvent.nEventIdentity, Message:='Reverted Event Identity is not matching with 3rd Event');
+	AssertEquals(Expected:=eEvent3.sEventText, Actual:=stEvent.sEventText, Message:='Reverted Event text is not matching with 3rd Event');
+	AssertEquals(Expected:=eEvent3.dtTimeStamp, Actual:=stEvent.dtTimeStamp, Message:='Reverted date is not matching with 3rd Event');	
+	nNumberOfEvents:=EventRingBuffer.getNumberOfEventsInBuffer();
+	AssertEquals_UDINT(Expected:=0,
+				 Actual:= nNumberOfEvents,
+				 Message:='event read and removal to ring buffer is not done');
+	
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

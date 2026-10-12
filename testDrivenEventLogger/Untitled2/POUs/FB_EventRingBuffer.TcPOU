@@ -32,6 +32,15 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Method Name="getNumberOfEventsInBuffer" Id="{44905e0c-6036-4bbb-882c-420564f049bc}">
+      <Declaration><![CDATA[METHOD getNumberOfEventsInBuffer : UDINT
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[getNumberOfEventsInBuffer:=SIZEOF(bufferRingArray);]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Remove" Id="{013e1d0a-326c-4d96-b493-210e65f797d3}">
       <Declaration><![CDATA[METHOD Remove : BOOL
 VAR_OUTPUT
@@ -39,7 +48,7 @@ VAR_OUTPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF currentPosition:=0 THEN
+        <ST><![CDATA[IF currentPosition =0 THEN
 	Remove:= FALSE;
 ELSE
 	stEvent:= bufferRingArray[currentPosition];
